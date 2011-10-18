@@ -23,10 +23,7 @@ def _flatten(d, parent):
         if type(v) == dict:
             final.update(_flatten(v, parent='%s[%s]' % (parent, k)))
         else:
-            if parent:
-                final['%s[%s]' % (parent, k)] = v
-            else:
-                final[k] = v
+            final['%s[%s]' % (parent, k)] = v
     return final
 
 def php_encode(data):

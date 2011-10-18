@@ -1,21 +1,40 @@
-import urllib, urllib2, json
+import urllib
+import urllib2
+try:
+    import json
+except ImportError:
+    import simplejson as json
 
-class API:
+API_KEY = 'Your API Key Here'
+API_URL = url='https://api.wbsrvc.com/%s/%s/'
 
-    url = 'https://api.wbsrvc.com/'
+def request(noun, verb, **params):
+    headers = {'apikey' : API_KEY}
+    body = php_encode(params)
+    url = API_URL % (noun, verb)
+    request = urllib2.Request(url, body, headers)
+    response = json.loads(urllib2.urlopen(request).read())
+    assert response['status'] == 'success', response
+    return response['data']
 
-    def __init__(self, key):
-        self.header = dict(apikey=key)
+def _flatten(d, parent):
+    final = {}
+    for k, v in d.items():
+        if type(v) == dict:
+            final.update(_flatten(v, parent='%s[%s]' % (parent, k)))
+        else:
+            if parent:
+                final['%s[%s]' % (parent, k)] = v
+            else:
+                final[k] = v
+    return final
 
-    def call(self, method, params):
-        request = urllib2.Request(
-            self.url + method[0] + '/' + method[1],
-            urllib.urlencode(params),
-            self.header
-        )
-        try:
-            response = json.loads(urllib2.urlopen(request).read())
-            return response
-        except urllib2.HTTPError as error:
-            return dict(Error=str(error))
-        
+def php_encode(data):
+    parts = []
+    for k, v in data.items():
+        if type(v) == dict:
+            parts.extend(_flatten(v, parent=k).items())
+        else:
+            parts.append((k, v))
+    parts.sort()
+    return urllib.urlencode(parts)

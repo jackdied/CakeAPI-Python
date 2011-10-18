@@ -1,7 +1,5 @@
-# Python Class to consume the CakeMail API
+# Simple CakeAPI interface
 
-You can find the CakeMail API documentation on the [Dev Portal](http://dev.cakemail.com)
-
-## Requirements
+Just set the API_KEY and call cakeapi.request('Noun', 'verb', param1=val1, param2=val2, ...)
 
 Standard libs: urllib, urllib2, json

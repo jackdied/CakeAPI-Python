@@ -1,32 +1,13 @@
-# -*- coding: UTF-8 -*-
+import unittest
+import urllib
 
-from cakeapi import API
-import json # Not needed. Used only for pretty printing the JSON object
+from cakeapi import php_encode
 
-# Initialize the API Object by parsing your API Key
-apiobj = API('YourApiKey')
-
-# Log in
-login_params = {
-    'email'     :   'some@email.com', 
-    'password'  :   'abc123'
-}
-
-# Pass the params to the API as an array['Class','Method'] and a dictionary with params
-response = apiobj.call(['User', 'login'], login_params)
-print json.dumps(response, indent=2)
-
-# Subscribing an email to a list with custom fields
-subscribe_params = {
-    'user_key'          :   'theUserKey',
-    'list_id'           :   'theListId',
-    'client_id'         :   'theClientId',
-    'email'             :   'theEmailToSusbcribe',
-    'data[First Name]'  :   'FirstName',
-    'data[Last Name]'   :   'LastName',
-    'data[Phone #]'     :   '514826936',
-    'data[Endereço]'    :   '1234 Rnd Street'
-}
-
-response = apiobj.call(['List', 'subscribeEmail'], subscribe_params)
-print json.dumps(response, indent=2)
+class TestAPI(unittest.TestCase):
+    def test_php_encode(self):
+        params = {'0' : {'foo':7}, '1' : {'bar':3, 'baz':5}}
+        want = 'record[0][foo]=7&record[1][bar]=3&record[1][baz]=5'
+        self.assertEqual(want, urllib.unquote(php_encode({'record' : params})))
+        # the hash order of the following happens to match the sort order
+        params = {'allo' : 7, 'world' : '!'}
+        self.assertEqual(urllib.urlencode(params), php_encode(params))
